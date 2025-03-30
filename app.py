@@ -44,6 +44,6 @@ def predict():
         return jsonify({'error': str(e)}), 500  # ✅ Handle errors
 
 # Run Flask app
-if _name_ == '_main_':  # ✅ Corrected
+if __name__ == '__main__':  # ✅ Corrected
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
