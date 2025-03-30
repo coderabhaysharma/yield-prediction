@@ -9,7 +9,8 @@ model = joblib.load("model.pkl")
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+CORS(app, origins=["http://localhost:5173"])
+
 
 @app.route('/')
 def home():
