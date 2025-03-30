@@ -8,7 +8,7 @@ import os
 model = joblib.load("model.pkl")
 
 # Initialize Flask app
-app = Flask(_name_)  # ✅ Corrected
+app = Flask(__name__)  # ✅ Corrected
 
 # Enable CORS
 CORS(app, origins="*", supports_credentials=True)  # ✅ Allow all origins
