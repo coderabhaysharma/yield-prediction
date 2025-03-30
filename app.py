@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-from flask_cors import CORS  # Import CORS
+from flask_cors import CORS
 import joblib
 import pandas as pd
 import os
@@ -9,14 +9,17 @@ model = joblib.load("model.pkl")
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 @app.route('/')
 def home():
     return render_template('index.html')
 
-@app.route('/predict', methods=['POST'])
+@app.route('/predict', methods=['POST', 'OPTIONS'])  # Handle OPTIONS for preflight
 def predict():
+    if request.method == "OPTIONS":
+        return '', 204  # Return HTTP 204 No Content for preflight requests
+
     # Get form data
     state = request.form['state']
     district = request.form['district']
@@ -31,7 +34,7 @@ def predict():
     # Predict production
     prediction = model.predict(user_input)[0]
 
-    return jsonify({'prediction': round(prediction, 2)})  # Return JSON response
+    return jsonify({'prediction': round(prediction, 2)})
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
