@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import joblib
 import pandas as pd
-
+import os
 # Load trained model
 model = joblib.load("model.pkl")
 
