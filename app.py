@@ -1,47 +1,38 @@
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request, jsonify
+from flask_cors import CORS  # Import CORS
 import joblib
-import pandas as pd 
+import pandas as pd
 import os
-from flask_cors import CORS  # Import Flask-CORS
 
 # Load trained model
 model = joblib.load("model.pkl")
 
 # Initialize Flask app
 app = Flask(__name__)
-
-# Enable CORS (Allow frontend from React on localhost)
-CORS(app, resources={r"/*": {"origins": "https://localhost:5173"}})
+CORS(app)  # Enable CORS for all routes
 
 @app.route('/')
 def home():
-    return jsonify({"message": "Yield Prediction API is running!"})
+    return render_template('index.html')
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    try:
-        # Get JSON data from request
-        data = request.json  
+    # Get form data
+    state = request.form['state']
+    district = request.form['district']
+    season = request.form['season']
+    crop = request.form['crop']
+    area = float(request.form['area'])
 
-        # Extract input values
-        state = data['state']
-        district = data['district']
-        season = data['season']
-        crop = data['crop']
-        area = float(data['area'])
+    # Create input DataFrame
+    user_input = pd.DataFrame([[state, district, season, crop, area]],
+                              columns=['State_Name', 'District_Name', 'Season', 'Crop', 'Area'])
 
-        # Create input DataFrame
-        user_input = pd.DataFrame([[state, district, season, crop, area]],
-                                  columns=['State_Name', 'District_Name', 'Season', 'Crop', 'Area'])
+    # Predict production
+    prediction = model.predict(user_input)[0]
 
-        # Predict production
-        prediction = model.predict(user_input)[0]
-
-        return jsonify({"predicted_yield": round(prediction, 2)})
-
-    except Exception as e:
-        return jsonify({"error": str(e)})
+    return jsonify({'prediction': round(prediction, 2)})  # Return JSON response
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))  # Use PORT from environment, default to 5000
+    port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
