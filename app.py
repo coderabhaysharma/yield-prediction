@@ -34,7 +34,8 @@ def predict():
     # Predict production
     prediction = model.predict(user_input)[0]
 
-    return jsonify({'prediction': round(prediction, 2)})
+    return jsonify({'prediction': float(round(prediction, 2))})
+
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
